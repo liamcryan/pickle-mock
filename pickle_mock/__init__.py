@@ -1,1 +1,1 @@
-from .api import mock, pickle
+from .api import pickle_mock

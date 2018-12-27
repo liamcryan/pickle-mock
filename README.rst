@@ -27,8 +27,9 @@ Then you might want to test it::
         # and then assert some things about my_div and my_ps
 
 All right, so I had some code like this and the tests were taking a long time because a lot of requests
-were being made.  I wanted to mock the request so that it didn't actually make the request.  So to do that
-I needed to write a custom class that mirrored some of the aspects of the response 'r' so that default responses
+were being made.  I wanted to mock the request so that it didn't actually make the request.  vcrpy is a library
+that will do this automatically, but wasn't working for me because I am using a proxy.  It looks like a long-standing
+bug.  I chose to write a custom class that mirrored some of the aspects of the response 'r' so that default responses
 were provided and I didn't actually need to make the time consuming requests::
 
     class CustomResponse:
@@ -40,7 +41,7 @@ Oh, it looks like I also needed to mirror some aspects of the r.html.html attrib
 
     class CustomHTML:
         def find(*args, first)
-            return # don't return None, but something useful
+            return # don't return None, but something useful, how about the element?
 
 So for the above example, my mock test might look like::
 
@@ -77,9 +78,9 @@ Now, I need to remember to change the CustomResponse class!::
             self.html = HTML()
             self.status_code = 200
 
-There must be a better way.  I'm sure there are a log of solutions, but I think this one is pretty general...once
-I create my code, what if my responses to functions could be mocked so that they were the exact response instead of
-one that I hand craft.  Pickle, isn't that what you do?
+It seems like these small changes can get out of hand.  There must be a better way.  I'm sure there are a lot of
+solutions, but I think this one is pretty general...once I create my code, what if my responses to functions could be
+saved so that they were the exact response instead of one that I hand craft.  Pickle, isn't that what you do?
 
 
 With pickle mock
@@ -101,9 +102,7 @@ Let's add in the pickle mock code::
     from my_code_file import my_code
     from requests_html import HTMLSession
 
-    pickle_mock.pickle(name='my_function.HTMLSession.get', func=HTMLSession.get, args=('https://google.com', ))
-
-    @pickle_mock.mock('my_function.HTMLSession.get')
+    @pickle_mock.pickle_mock(func=HTMLSession.get, args=('https://google.com', ))
     def test_my_code():
         my_div, my_ps = my_code()
         # and then assert some things about my_div and my_ps

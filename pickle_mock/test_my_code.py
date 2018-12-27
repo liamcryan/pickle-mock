@@ -3,6 +3,7 @@ import pickle_mock
 from requests_html import HTMLSession
 
 url = 'https://google.com'
+verify = False
 
 
 def my_code(url, verify=False):
@@ -15,13 +16,13 @@ def my_code(url, verify=False):
         ps = r.html.find('p')
         return div, ps
 
-# pickle will save the output of the correct call to HTMLSession.get...how to identify the correct call?
-pickle_mock.pickle(name='my_function.HTMLSession.get', func=HTMLSession.get, args=('url',), kwargs={'verify': False})
 
-
-@pickle_mock.mock('my_function.HTMLSession.get')  # this will set MagicMock(side_effect=open('my_function....
+@pickle_mock.pickle_mock(func=HTMLSession.get, args=(url,), kwargs={'verify': verify})
 def test_my_code():
-    my_div, my_ps = my_code()
-    assert my_div == ''  # i'm not sure what this will be yet
-    assert my_ps == []  # same
-    # and then assert some things about my_div and my_ps
+    my_div, my_ps = my_code(url=url, verify=verify)
+    assert my_div.attrs == {'class': ('ctr-p',), 'id': 'viewport'}
+    assert my_ps[0].full_text == 'Your Google Account'
+
+
+if __name__ == '__main__':
+    test_my_code()
