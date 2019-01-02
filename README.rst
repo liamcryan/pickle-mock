@@ -2,6 +2,9 @@
 pickle mock
 ===========
 
+Note: This repository serves as a proof-of-concept and came about off the cuff.  It has served its purpose
+and will hopefully lead to further ideas.
+
 With a name like 'pickle mock', I would say this library does something like pickle mock your tests.
 
 What does that mean exactly?  I'm not sure yet, but here is an example of some code you might have in a project::
